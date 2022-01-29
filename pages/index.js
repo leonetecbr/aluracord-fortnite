@@ -1,36 +1,9 @@
 import { Box, Button, Text, TextField, Image } from '@skynexui/components'
 import appConfig from '../config.json'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
 
 // Componente React
-function GlobalStyle(){
-  return (
-    <style global jsx>{`
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        list-style: none;
-      }
-      body {
-        font-family: 'Open Sans', sans-serif;
-      }
-      /* App fit Height */ 
-      html, body, #__next {
-        min-height: 100vh;
-        display: flex;
-        flex: 1;
-      }
-      #__next {
-        flex: 1;
-      }
-      #__next > * {
-        flex: 1;
-      }
-      /* ./App fit Height */ 
-    `}</style>
-  )
-}
-
 function Title(props) {
   const Tag = props.tag || 'h1';
   return (
@@ -47,25 +20,26 @@ function Title(props) {
   );
 }
 
-// function HomePage() {
-//   // JSX
-//   return (
-//     <div>
-//       <GlobalStyle />
-//       <Title tag="h1">Boas vindas de volta!</Title>
-//       <h2>Discord - Alura Matriz</h2>
-//     </div>
-//   )
-// }
+function InvalidUser(){
+  document.getElementById('form-submit').setAttribute('disabled', true)
+  document.getElementById('user-image').style.display = 'none'
+  document.getElementById('fail-image').style.display = 'block'
+  if (document.getElementById('username-input').value !== '') document.getElementById('user-name').innerHTML = 'Nome de usário inválido!'
+  else document.getElementById('user-name').innerHTML = 'Insira o nome de usuário!'
+}
 
-// export default HomePage
+function ValidUser() {
+  document.getElementById('form-submit').removeAttribute('disabled')
+  document.getElementById('fail-image').style.display = 'none'
+  document.getElementById('user-image').style.display = 'block'
+}
 
 export default function PaginaInicial() {
-  const username = 'leonetecbr';
+  let [username, setUsername] = useState('leonetecbr')
+  let router = useRouter()
 
   return (
     <>
-      <GlobalStyle />
       <Box
         styleSheet={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -110,14 +84,28 @@ export default function PaginaInicial() {
             }}
           >
             <Image
+              id='user-image'
               styleSheet={{
                 borderRadius: '50%',
                 marginBottom: '16px',
+                display: 'block'
               }}
               src={`https://github.com/${username}.png`}
+              onError={InvalidUser}
+              onLoad={ValidUser}
+            />
+            <Image
+              id='fail-image'
+              styleSheet={{
+                borderRadius: '50%',
+                marginBottom: '16px',
+                display: 'none'
+              }}
+              src={`/Fortnite.png`}
             />
             <Text
-              variant="body4"
+              id='user-name'
+              variant='body4'
               styleSheet={{
                 color: appConfig.theme.colors.neutrals[700],
                 backgroundColor: appConfig.theme.colors.neutrals['000'],
@@ -131,11 +119,16 @@ export default function PaginaInicial() {
           {/* Photo Area */}
           {/* Formulário */}
           <Box
-            as="form"
+            as='form'
+            onSubmit={(event) => {
+              event.preventDefault()
+              router.push('/chat')
+            }}
             styleSheet={{
               display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
               width: { xs: '100%', sm: '50%' }, textAlign: 'center', marginBottom: '32px',
             }}
+            autoComplete='off'
           >
             <Title tag="h2">Boas vindas de volta!</Title>
             <Text variant="body3" styleSheet={{ marginBottom: '32px', color: appConfig.theme.colors.neutrals[300] }}>
@@ -144,6 +137,7 @@ export default function PaginaInicial() {
 
             <TextField
               fullWidth
+              id='username-input'
               placeholder="Digite seu usuário do GitHub ..."
               value={username}
               textFieldColors={{
@@ -154,8 +148,13 @@ export default function PaginaInicial() {
                   backgroundColor: appConfig.theme.colors.neutrals[100],
                 },
               }}
+              onChange={(event) => {
+                let valor = event.target.value
+                setUsername(valor)
+              }}
             />
             <Button
+              id="form-submit"
               type='submit'
               label='Entrar'
               fullWidth
