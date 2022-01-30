@@ -27,7 +27,7 @@ function GlobalStyle() {
   )
 }
 
-function MyApp({ Component, pageProps }) {
+export default ({ Component, pageProps }) => {
   return (
     <>
       <GlobalStyle />
@@ -35,5 +35,3 @@ function MyApp({ Component, pageProps }) {
     </>
   )
 }
-
-export default MyApp

@@ -35,8 +35,13 @@ function ValidUser() {
 }
 
 export default function PaginaInicial() {
-  let [username, setUsername] = useState('leonetecbr')
   let router = useRouter()
+  let [username, setUsername] = useState('leonetecbr')
+  const user = typeof window !== 'undefined' ? localStorage.getItem('username') : null
+
+  if (user){
+    router.push('/chat')
+  }
 
   return (
     <>
@@ -122,6 +127,7 @@ export default function PaginaInicial() {
             as='form'
             onSubmit={(event) => {
               event.preventDefault()
+              if (typeof window !== 'undefined') localStorage.setItem('username', document.getElementById('username-input').value)
               router.push('/chat')
             }}
             styleSheet={{
