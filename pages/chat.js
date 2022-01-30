@@ -15,9 +15,8 @@ const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 function listenerMessagesRealTime(listener){
   supabaseClient
     .from('mensagens')
-    .on('INSERT', (mensagem) => {
-      listener(mensagem)
-    })
+    .on('INSERT', (mensagem) => listener(mensagem))
+    .on('DELETE', (mensagem) => listener(mensagem))
     .subscribe()
 }
 
@@ -87,12 +86,18 @@ export default () => {
   }
 
   listenerMessagesRealTime((data) => {
-    setMessageList(() => {
-      return [
-        data.new,
-        ...messageList
-      ]
-    })
+    if (data.eventType === 'INSERT'){
+      setMessageList(() => {
+        return [
+          data.new,
+          ...messageList
+        ]
+      })
+    } else if (data.eventType === 'DELETE') {
+      setMessageList(() => {
+        return messageList.filter((mensagem) => mensagem.id !== data.old.id)
+      })
+    }
   })
 
   setTimeout(() => {
@@ -141,7 +146,7 @@ export default () => {
           }}
         >
 
-          <MessageList mensagens={messageList} />
+          <MessageList mensagens={messageList} usuario={username}/>
 
           <Box
             as='form'

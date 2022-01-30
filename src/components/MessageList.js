@@ -1,5 +1,18 @@
-import { Box, Text, Image } from '@skynexui/components'
+import { Box, Text, Image, Icon} from '@skynexui/components'
 import appConfig from '../../config.json'
+import { createClient } from '@supabase/supabase-js'
+
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzU0NzQyMCwiZXhwIjoxOTU5MTIzNDIwfQ.FPhA4iCzsZBxp1UcxWxJZOz2JWaOziP-xOjVllW-j2o'
+const SUPABASE_URL = 'https://ieckdnomhagqpnnjiqkl.supabase.co'
+
+function deleteMessage(id) {
+  const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  supabaseClient
+    .from('mensagens')
+    .delete()
+    .match({id: id})
+    .then()
+}
 
 export function MessageList(props) {
 
@@ -75,6 +88,16 @@ export function MessageList(props) {
                   />
                 ) : (mensagem.texto)}
             </Box>
+            {mensagem.de==props.usuario && (
+            <Icon 
+              name='FaTrashAlt'
+              styleSheet={{
+                marginLeft: 'auto',
+                cursor: 'pointer'
+              }}
+              onClick={() => deleteMessage(mensagem.id)}
+            />
+            )}
           </Text>
         )
       })}
