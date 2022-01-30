@@ -1,9 +1,9 @@
-import React from 'react';
+import { useState } from 'react';
 import { Box, Button, Text, Image } from '@skynexui/components';
 import appConfig from '../../config.json';
 
 export function ButtonSendSticker(props) {
-  const [isOpen, setOpenState] = React.useState('');
+  const [isOpen, setOpenState] = useState('');
 
   return (
     <Box
@@ -15,23 +15,21 @@ export function ButtonSendSticker(props) {
         styleSheet={{
           borderRadius: '50%',
           padding: '0 3px 0 0',
-          minWidth: '50px',
-          minHeight: '50px',
+          width: '50px',
+          height: '50px',
           fontSize: '20px',
           marginBottom: '8px',
-          lineHeight: '0',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: appConfig.theme.colors.primary[400],
+          lineHeight: '20px',
+          padding: '7.5px',
+          backgroundColor: appConfig.theme.colors.primary[500],
           hover: {
-            backgroundColor: appConfig.theme.colors.primary[500],
+            backgroundColor: appConfig.theme.colors.primary[600],
           },
           focus: {
-            backgroundColor: appConfig.theme.colors.primary[500],
+            backgroundColor: appConfig.theme.colors.primary[600],
           },
         }}
-        label="😋"
+        label='😋'
         onClick={() => setOpenState(!isOpen)}
       />
       {isOpen && (
@@ -41,7 +39,7 @@ export function ButtonSendSticker(props) {
             flexDirection: 'column',
             borderRadius: '5px',
             position: 'absolute',
-            backgroundColor: appConfig.theme.colors.neutrals[800],
+            backgroundColor: appConfig.theme.colors.primary[600],
             width: {
               xs: '200px',
               sm: '290px',
@@ -56,14 +54,14 @@ export function ButtonSendSticker(props) {
         >
           <Text
             styleSheet={{
-              color: appConfig.theme.colors.neutrals["000"],
+              color: appConfig.theme.colors.neutrals['000'],
               fontWeight: 'bold',
             }}
           >
             Stickers
           </Text>
           <Box
-            tag="ul"
+            tag='ul'
             styleSheet={{
               display: 'flex',
               flexWrap: 'wrap',
@@ -76,21 +74,20 @@ export function ButtonSendSticker(props) {
             {appConfig.stickers.map((sticker) => (
               <Text
                 onClick={() => {
-                  // console.log('[DENTRO DO COMPONENTE] Clicou no sticker:', sticker);
                   if (Boolean(props.onStickerClick)) {
                     props.onStickerClick(sticker);
                   }
                 }}
-                tag="li" key={sticker}
+                tag='li' key={sticker}
                 styleSheet={{
                   width: '50%',
                   borderRadius: '5px',
                   padding: '10px',
                   focus: {
-                    backgroundColor: appConfig.theme.colors.neutrals[600],
+                    backgroundColor: appConfig.theme.colors.primary[700],
                   },
                   hover: {
-                    backgroundColor: appConfig.theme.colors.neutrals[600],
+                    backgroundColor: appConfig.theme.colors.primary[700],
                   }
                 }}
               >

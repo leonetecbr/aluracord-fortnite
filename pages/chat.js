@@ -1,9 +1,10 @@
-import { Box, Text, TextField, Image, Button } from '@skynexui/components'
+import { Box, Text, TextField, Button } from '@skynexui/components'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import appConfig from '../config.json'
 import { createClient } from '@supabase/supabase-js'
 import { ButtonSendSticker } from '../src/components/ButtonSendSticker'
+import { MessageList } from '../src/components/MessageList'
 
 let username = typeof window !== 'undefined' ? localStorage.getItem('username') : null
 
@@ -11,19 +12,28 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5v
 const SUPABASE_URL = 'https://ieckdnomhagqpnnjiqkl.supabase.co'
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
+function listenerMessagesRealTime(listener){
+  supabaseClient
+    .from('mensagens')
+    .on('INSERT', (mensagem) => {
+      listener(mensagem)
+    })
+    .subscribe()
+}
+
 function Header() {
   let router = useRouter()
 
   return (
     <>
-      <Box styleSheet={{ width: '100%', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
+      <Box styleSheet={{ width: '100%', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between'}} >
         <Text variant='heading5'>
           Chat
         </Text>
         <Box>
           <span id='username-head'></span>
           <Button
-            label='Logout'
+            label='Sair'
             buttonColors={{
               contrastColor: appConfig.theme.colors.neutrals["000"],
               mainColor: appConfig.theme.colors.primary[500],
@@ -44,76 +54,6 @@ function Header() {
   )
 }
 
-function MessageList(props) {
-
-  return (
-    <Box
-      tag="ul"
-      styleSheet={{
-        overflow: 'auto',
-        display: 'flex',
-        flexDirection: 'column',
-        flex: 1,
-        marginBottom: '16px',
-      }}
-    >
-      {props.mensagens.map((mensagem) => {
-        return (
-          <Text
-            key={mensagem.id}
-            tag="li"
-            styleSheet={{
-              borderRadius: '5px',
-              padding: '6px',
-              marginBottom: '12px',
-              backgroundColor: appConfig.theme.colors.primary[700], 
-            }}
-          >
-            <Box
-              styleSheet={{
-                marginBottom: '8px',
-                display: 'flex',
-              }}
-            >
-              <Image
-                styleSheet={{
-                  width: '20px',
-                  height: '20px',
-                  borderRadius: '50%',
-                  marginRight: '8px',
-                }}
-                src={`https://github.com/${mensagem.de}.png`}
-              />
-              <Text tag="strong">
-                {mensagem.de}
-              </Text>
-              <Text
-                styleSheet={{
-                  fontSize: '10px',
-                  marginLeft: '8px',
-                  color: appConfig.theme.colors.neutrals[300],
-                  marginLeft: 'auto',
-                  marginRight: '5px'
-                }}
-                tag="span"
-              >
-                {new Date(mensagem.created_at).toLocaleDateString()}
-              </Text>
-            </Box>
-            <Box
-              styleSheet={{
-                padding: '5px', 
-              }}
-            >
-              {mensagem.texto}
-            </Box>
-          </Text>
-        )
-      })}
-    </Box>
-  )
-}
-
 export default () => {
   let router = useRouter()
   let [message, setMessage] = useState('')
@@ -125,11 +65,9 @@ export default () => {
     supabaseClient
     .from('mensagens')
       .select('*')
-      .order('id')
+      .order('id', {ascending: false})
       .then(
-        ({ data }) => {
-          setMessageList(data)
-        }
+        ({ data }) => setMessageList(data)
       )
     document.getElementById('username-head').innerHTML = '@' + username
   }, [])
@@ -143,17 +81,19 @@ export default () => {
     supabaseClient
       .from('mensagens')
       .insert(message)
-      .then(
-        ({ data }) => {
-          setMessageList([
-            ...messageList,
-            data[0]
-          ])
-        }
-      )
+      .then()
 
     setMessage('')
   }
+
+  listenerMessagesRealTime((data) => {
+    setMessageList(() => {
+      return [
+        data.new,
+        ...messageList
+      ]
+    })
+  })
 
   setTimeout(() => {
     if(username === null && typeof window !== 'undefined') {
@@ -168,7 +108,7 @@ export default () => {
         backgroundColor: appConfig.theme.colors.primary[200],
         backgroundImage: `url(https://cdn1.epicgames.com/offer/fn/19BR_KeyArt_EGS_Launcher_Blade_2560x1440_2560x1440-0c719814e3356a4726560c70f0462e7b)`,
         backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundBlendMode: 'multiply',
-        color: appConfig.theme.colors.neutrals['000']
+        color: appConfig.theme.colors.neutrals['000'],
       }}
     >
       <Box
@@ -183,7 +123,8 @@ export default () => {
           maxWidth: '95%',
           maxHeight: '95vh',
           padding: '32px',
-          opacity: '0.9'
+          opacity: '0.9',
+          maxWidth: '800px'
         }}
       >
         <Header />
@@ -203,7 +144,7 @@ export default () => {
           <MessageList mensagens={messageList} />
 
           <Box
-            as="form"
+            as='form'
             styleSheet={{
               display: 'flex',
               alignItems: 'center',
@@ -219,8 +160,8 @@ export default () => {
                   handleNewMessage(message)
                 }
               }}
-              placeholder="Insira sua mensagem aqui..."
-              type="textarea"
+              placeholder='Insira sua mensagem aqui...'
+              type='textarea'
               styleSheet={{
                 width: '100%',
                 border: '0',
@@ -232,7 +173,7 @@ export default () => {
                 color: appConfig.theme.colors.neutrals[900],
               }}
             />
-            <ButtonSendSticker />
+            <ButtonSendSticker onStickerClick={(url) => handleNewMessage(':sticker: '+url)}/>
           </Box>
         </Box>
       </Box>
