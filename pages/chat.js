@@ -72,6 +72,8 @@ export default () => {
   }, [])
 
   function handleNewMessage(newMessage) {
+    if (newMessage === '') return
+
     const message = {
       de: username,
       texto: newMessage
