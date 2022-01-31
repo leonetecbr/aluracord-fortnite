@@ -12,8 +12,8 @@ export function ButtonSendSticker(props) {
       }}
     >
       <Button
+        iconName='FaSmile'
         styleSheet={{
-          borderRadius: '50%',
           padding: '0 3px 0 0',
           width: '50px',
           height: '50px',
@@ -29,7 +29,6 @@ export function ButtonSendSticker(props) {
             backgroundColor: appConfig.theme.colors.primary[600],
           },
         }}
-        label='😋'
         onClick={() => setOpenState(!isOpen)}
       />
       {isOpen && (

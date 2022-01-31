@@ -1,4 +1,4 @@
-import { Box, Text, TextField, Button } from '@skynexui/components'
+import { Box, Text, TextField, Button, Icon } from '@skynexui/components'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import appConfig from '../config.json'
@@ -179,6 +179,33 @@ export default () => {
               }}
             />
             <ButtonSendSticker onStickerClick={(url) => handleNewMessage(':sticker: '+url)}/>
+            <Box
+              styleSheet={{
+                position: 'relative',
+              }}
+            >
+              <Button
+                iconName='FaArrowRight'
+                styleSheet={{
+                  padding: '0 3px 0 0',
+                  width: '50px',
+                  height: '50px',
+                  fontSize: '20px',
+                  marginBottom: '8px',
+                  marginLeft: '10px',
+                  lineHeight: '20px',
+                  padding: '7.5px',
+                  backgroundColor: appConfig.theme.colors.primary[500],
+                  hover: {
+                    backgroundColor: appConfig.theme.colors.primary[600],
+                  },
+                  focus: {
+                    backgroundColor: appConfig.theme.colors.primary[600],
+                  },
+                }}
+                onClick={() => handleNewMessage(message)}
+              />
+            </Box>
           </Box>
         </Box>
       </Box>
