@@ -1,16 +1,36 @@
-import { Box, Text, TextField, Button, Icon } from '@skynexui/components'
+import { Box, Text, TextField, Button, Icon, Image } from '@skynexui/components'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import appConfig from '../config.json'
 import { createClient } from '@supabase/supabase-js'
 import { ButtonSendSticker } from '../src/components/ButtonSendSticker'
 import { MessageList } from '../src/components/MessageList'
+import Link from 'next/link'
+import axios from 'axios'
 
 let username = typeof window !== 'undefined' ? localStorage.getItem('username') : null
 
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzU0NzQyMCwiZXhwIjoxOTU5MTIzNDIwfQ.FPhA4iCzsZBxp1UcxWxJZOz2JWaOziP-xOjVllW-j2o'
 const SUPABASE_URL = 'https://ieckdnomhagqpnnjiqkl.supabase.co'
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+const gitData = {
+  avatar_url: '/Fortnite.png',
+  login: null,
+  name: null,
+  blog: null,
+  location: null,
+  public_repos: null,
+  followers: null,
+  following: null,
+  created_at: '2017-03-05T01:06:59Z',
+  bio: null
+}
+
+function getDate(timestamp){
+  let time = new Date(timestamp)
+  return time.toLocaleDateString()
+}
 
 function listenerMessagesRealTime(listener){
   supabaseClient
@@ -29,8 +49,13 @@ function Header() {
         <Text variant='heading5'>
           Chat
         </Text>
-        <Box>
-          <span id='username-head'></span>
+        <Box
+          styleSheet={{
+              display: 'flex',
+              alignItems: 'center'
+          }}
+        >
+          <Text id='username-head'></Text>
           <Button
             label='Sair'
             buttonColors={{
@@ -59,6 +84,17 @@ export default () => {
 
   username = typeof window !== 'undefined' ? localStorage.getItem('username') : null
   let [messageList, setMessageList] = useState([])
+  let [githubData, setGithubData] = useState(gitData)
+
+  function handleMouseEnter(username) {
+    axios.get('https://api.github.com/users/'+username)
+      .then(function ({data}) {
+        setGithubData(data)
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
+  }
 
   useEffect(() => {
     supabaseClient
@@ -120,6 +156,100 @@ export default () => {
     >
       <Box
         styleSheet={{
+          backgroundColor: appConfig.theme.colors.primary[500],
+          height: '90%',
+          marginRight: '20px',
+          padding: '30px',
+          display: 'flex',
+          flexDirection: 'column',
+          width: '300px',
+          display: 'none',
+          position: 'absolute',
+          zIndex: 999,
+          left: '40px'
+        }}
+        id='github-data'
+        onMouseEnter={() => document.getElementById('github-data').style.display = 'block'}
+        onMouseLeave={() => document.getElementById('github-data').style.display = 'none'}
+      >
+        <Image
+          styleSheet={{
+            borderRadius: '50%',
+            height: '200px',
+            width: '200px',
+            margin: '0 auto 10px auto'
+          }}
+          src={githubData.avatar_url}/>
+        <Box
+          styleSheet={{
+            textAlign: 'center',
+            marginLeft: 'auto',
+            marginRight: 'auto'
+          }}
+          >
+          <Text variant='heading5'>{githubData.name}</Text>
+          <Text styleSheet={{
+            fontSize: '11px',
+            fontWeight: 'light'
+          }}>@{githubData.login}</Text>
+        </Box>
+        {(githubData.blog && (    
+          <Box styleSheet={{
+            marginTop: '20px',
+            display: 'flex'
+          }}>
+            <Icon name='FaGlobe' styleSheet={{
+              marginRight: '10px'
+            }}/>
+            <Link href={githubData.blog}>
+              <a>{githubData.blog.replace('https://', '')}</a>
+            </Link>
+          </Box>))}
+        {(githubData.location && (
+          <Box styleSheet={{
+            marginTop: '10px',
+            display: 'flex'
+          }}>
+            <Icon name='FaLocationArrow' styleSheet={{
+              marginRight: '10px'
+            }}/> {githubData.location}
+          </Box>
+        ))}
+        <Box styleSheet={{
+          marginTop: '10px',
+          display: 'flex'
+        }}>
+          <Icon name='FaCode' styleSheet={{
+            marginRight: '10px'
+          }} /> {githubData.public_repos} Repositórios Públicos
+        </Box>
+        <Box styleSheet={{
+          marginTop: '10px',
+          display: 'flex'
+        }}>
+          <Icon name='FaUsers' styleSheet={{
+            marginRight: '10px'
+          }} /> {githubData.followers} Seguidores
+        </Box>
+        <Box styleSheet={{
+          marginTop: '10px',
+          display: 'flex'
+        }}>
+          <Icon name='FaUserFriends' styleSheet={{
+            marginRight: '10px'
+          }} /> Seguindo {githubData.following}
+        </Box>
+        <Box styleSheet={{
+          marginTop: '10px',
+          display: 'flex'
+        }}>
+          <Icon name='FaCalendarDay' styleSheet={{
+            marginRight: '10px'
+          }}/>  Entrou em {getDate(githubData.created_at)}
+        </Box>
+      </Box>
+      <Box
+        styleSheet={{
           display: 'flex',
           flexDirection: 'column',
           flex: 1,
@@ -148,7 +278,7 @@ export default () => {
           }}
         >
 
-          <MessageList mensagens={messageList} usuario={username}/>
+          <MessageList mensagens={messageList} usuario={username} onMouseEnter={handleMouseEnter}/>
 
           <Box
             as='form'

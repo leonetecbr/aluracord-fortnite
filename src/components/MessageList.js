@@ -48,18 +48,30 @@ export function MessageList(props) {
                 display: 'flex',
               }}
             >
-              <Image
-                styleSheet={{
-                  width: '20px',
-                  height: '20px',
-                  borderRadius: '50%',
-                  marginRight: '8px',
+              <Box
+                onMouseEnter={() => {
+                  if (typeof props.onMouseEnter !== undefined) props.onMouseEnter(mensagem.de)
+                  document.getElementById('github-data').style.display = 'block'
                 }}
-                src={`https://github.com/${mensagem.de}.png`}
-              />
-              <Text tag="strong">
-                {mensagem.de}
-              </Text>
+                onMouseLeave={() => document.getElementById('github-data').style.display = 'none'}
+                styleSheet={{
+                  display: 'flex',
+                  cursor: 'pointer'
+                }}
+              >
+                <Image
+                  styleSheet={{
+                    width: '20px',
+                    height: '20px',
+                    borderRadius: '50%',
+                    marginRight: '8px',
+                  }}
+                  src={`https://github.com/${mensagem.de}.png`}
+                />
+                <Text tag="strong">
+                  {mensagem.de}
+                </Text>
+              </Box>
               <Text
                 styleSheet={{
                   fontSize: '10px',

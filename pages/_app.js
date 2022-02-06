@@ -1,3 +1,6 @@
+
+import appConfig from '../config.json'
+
 function GlobalStyle() {
   return (
     <style global jsx>{`
@@ -9,6 +12,13 @@ function GlobalStyle() {
       }
       body {
         font-family: 'Open Sans', sans-serif;
+      }
+      a{
+        text-decoration: none;
+        color: ${appConfig.theme.colors.primary[100]}
+      }
+      .bolder{
+        font-weight: bolder !important;
       }
       /* App fit Height */ 
       html, body, #__next {
